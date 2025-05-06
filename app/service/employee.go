@@ -4,6 +4,7 @@ import (
 	"emp-app/app/domain"
 	"emp-app/app/dto"
 	"emp-app/app/repository"
+	"emp-app/pkg/helpers/e"
 	"net/http"
 )
 
@@ -29,16 +30,16 @@ func (s *EmployeeServiceImpl) CreateEmployee(r *http.Request) (*domain.Employee,
 
 	body := &dto.EmployeeCreateRequest{}
 	if err := body.Parse(r); err != nil {
-		return nil, err
+		return nil, e.NewError(e.ErrDecodeRequestBody, "can't decode employee create request", err)
 	}
 
 	if err := body.Validate(); err != nil {
-		return nil, err
+		return nil, e.NewError(e.ErrValidateRequest, "can't validate employee create request", err)
 	}
 	emp, err := s.empRepo.CreateEmployee(body)
 
 	if err != nil {
-		return nil, err
+		return nil, e.NewError(e.ErrInternalServer, "cant create employee", err)
 	}
 
 	return emp, nil
@@ -47,16 +48,16 @@ func (s *EmployeeServiceImpl) CreateEmployee(r *http.Request) (*domain.Employee,
 func (s *EmployeeServiceImpl) GetEmployee(r *http.Request) (*domain.Employee, error) {
 	req := &dto.EmployeeRequest{}
 	if err := req.Parse(r); err != nil {
-		return nil, err
+		return nil, e.NewError(e.ErrInvalidRequest, "employee request parse error", err)
 	}
 
 	if err := req.Validate(r); err != nil {
-		return nil, err
+		return nil, e.NewError(e.ErrValidateRequest, "employee request validation error", err)
 	}
 
 	emp, err := s.empRepo.GetEmployee(req)
 	if err != nil {
-		return nil, err
+		return nil, e.NewError(e.ErrInternalServer, "getting employee failed", err)
 	}
 
 	var employee domain.Employee
@@ -80,15 +81,15 @@ func (s *EmployeeServiceImpl) UpdateEmployee(r *http.Request) error {
 	body := &dto.EmployeeUpdateRequest{}
 
 	if err := body.Parse(r); err != nil {
-		return err
+		return e.NewError(e.ErrDecodeRequestBody, "can't decode employee update request", err)
 	}
 
 	if err := body.Validate(); err != nil {
-		return err
+		return e.NewError(e.ErrValidateRequest, "can't validate employee update request", err)
 	}
 
 	if err := s.empRepo.UpdateEmployee(body); err != nil {
-		return err
+		return e.NewError(e.ErrInternalServer, "update employee failed", err)
 	}
 
 	return nil
@@ -99,7 +100,7 @@ func (s *EmployeeServiceImpl) GetAllEmployees(r *http.Request) ([]*domain.Employ
 	results, err := s.empRepo.GetAllEmployees()
 
 	if err != nil {
-		return nil, err
+		return nil, e.NewError(e.ErrInternalServer, "can't get all employees", err)
 	}
 
 	var employees []*domain.Employee
