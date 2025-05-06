@@ -1,17 +1,85 @@
 package response
 
+import (
+	"encoding/json"
+	"net/http"
+)
+
+const (
+	StatusOK   = "ok"
+	StatusFail = "not ok"
+)
+
 type Response struct {
-	StatusCode int         `json:"statuscode"`
-	Message    string      `json:"message"`
-	Data       interface{} `json:"data"`
-	Error      interface{} `json:"error"`
+	Status string          `json:"status"`
+	Error  *ResponseError  `json:"error,omitempty"`
+	Result json.RawMessage `json:"result,omitempty"`
 }
 
-func ClentResponse(status int, message string, data, err interface{}) Response {
-	return Response{
-		StatusCode: status,
-		Message: message,
-		Data: data,
-		Error: err,
+type ResponseError struct {
+	Code    int      `json:"code"`
+	Message string   `json:"message"`
+	Details []string `json:"details"`
+}
+
+func (e ResponseError) Error() string {
+	j, err := json.Marshal(e)
+	if err != nil {
+		return "ResponseError:" + err.Error()
 	}
+	return string(j)
+}
+
+// Success sends a successful JSON response using the standared success format
+func Success(w http.ResponseWriter, status int, result interface{}) {
+	resultJson, err := json.Marshal(result)
+	if err != nil {
+		http.Error(
+			w,
+			http.StatusText(http.StatusInternalServerError),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+	r := &Response{
+		Status: StatusOK,
+		Result: resultJson,
+	}
+	respJson, err := json.Marshal(r)
+	if err != nil {
+		http.Error(
+			w,
+			http.StatusText(http.StatusInternalServerError),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	w.Write(respJson)
+}
+
+// Fail sends an unsuccessful JSON response with the standared failure format
+func Fail(w http.ResponseWriter, status, errCode int, msg string, details ...string) {
+	// Give error response to client
+	r := &Response{
+		Status: StatusFail,
+		Error: &ResponseError{
+			Code:    errCode,
+			Message: msg,
+			Details: details,
+		},
+	}
+	respJson, err := json.Marshal(r)
+	if err != nil {
+		http.Error(
+			w,
+			http.StatusText(http.StatusInternalServerError),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	w.Write(respJson)
 }
