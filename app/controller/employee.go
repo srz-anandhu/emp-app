@@ -14,7 +14,6 @@ type EmployeeController interface {
 	GetAllEmployees(w http.ResponseWriter, r *http.Request)
 }
 
-
 type EmployeeControllerImpl struct {
 	empService service.EmployeeService
 }
@@ -30,9 +29,40 @@ func (c *EmployeeControllerImpl) CreateEmployee(w http.ResponseWriter, r *http.R
 	result, err := c.empService.CreateEmployee(r)
 	if err != nil {
 		httpErr := e.NewApiError(err, "can't create employee")
-		response.Fail(w, http.StatusInternalServerError, httpErr.Code, httpErr.Message, err.Error())
+		response.Fail(w, httpErr.StatusCode, httpErr.Code, httpErr.Message, err.Error())
 		return
 	}
 
 	response.Success(w, http.StatusCreated, result)
+}
+
+func (c *EmployeeControllerImpl) GetEmployee(w http.ResponseWriter, r *http.Request) {
+	result, err := c.empService.GetEmployee(r)
+	if err != nil {
+		httpErr := e.NewApiError(err, "can't get employee")
+		response.Fail(w, httpErr.StatusCode, httpErr.Code, httpErr.Message, err.Error())
+		return
+	}
+	response.Success(w, http.StatusOK, result)
+}
+
+func (c *EmployeeControllerImpl) UpdateEmployee(w http.ResponseWriter, r *http.Request) {
+	if err := c.empService.UpdateEmployee(r); err != nil {
+		httpErr := e.NewApiError(err, "can't update employee")
+		response.Fail(w, httpErr.StatusCode, httpErr.Code, httpErr.Message, err.Error())
+		return
+	}
+
+	response.Success(w, http.StatusOK, "updated employee successfully")
+}
+
+func (c *EmployeeControllerImpl) GetAllEmployees(w http.ResponseWriter, r *http.Request) {
+	results, err := c.empService.GetAllEmployees(r)
+	if err != nil {
+		httpErr := e.NewApiError(err, "can't get all employees")
+		response.Fail(w, httpErr.StatusCode, httpErr.Code, httpErr.Message, err.Error())
+		return
+	}
+
+	response.Success(w, http.StatusOK, results)
 }
