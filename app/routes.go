@@ -10,6 +10,7 @@ import (
 )
 func ApiRoute(db *gorm.DB) chi.Router {
 
+	// Dependency injection
 	empRepo := repository.NewEmployeeRepo(db)
 	empService := service.NewEmployeeService(empRepo)
 	empController := controller.NewEmployeeController(empService)
