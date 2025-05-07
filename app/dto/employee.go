@@ -13,7 +13,7 @@ import (
 type EmployeeCreateRequest struct {
 	ID       int       `json:"id"`
 	Name     string    `json:"name"`
-	DOB      time.Time `json:"dob"`
+	DOB      string `json:"dob"`
 	Email    string    `json:"email"`
 	Password string    `json:"password"`
 	Phone    string    `json:"phone"`

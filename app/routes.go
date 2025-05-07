@@ -18,7 +18,7 @@ func ApiRoute(db *gorm.DB) chi.Router {
 	r := chi.NewRouter()
 
 	r.Route("/employee", func(r chi.Router) {
-		r.Post("/create", empController.CreateEmployee)
+		r.Post("/signup", empController.CreateEmployee)
 		r.Put("/{id}", empController.UpdateEmployee)
 		r.Get("/{id}", empController.GetEmployee)
 		r.Get("/", empController.GetAllEmployees)

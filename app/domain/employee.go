@@ -5,7 +5,7 @@ import "time"
 type Employee struct {
 	ID        int       `gorm:"primaryKey;autoIncrement"`
 	Name      string    `gorm:"column:name"`
-	DOB       time.Time `gorm:"column:dob"`
+	DOB       string `gorm:"column:dob"`
 	Email     string    `gorm:"column:email"`
 	Password  string    `gorm:"column:password"`
 	Phone     string    `gorm:"column:phone"`

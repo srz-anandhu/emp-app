@@ -5,6 +5,7 @@ import (
 	"emp-app/app/dto"
 	"emp-app/app/repository"
 	"emp-app/pkg/helpers/e"
+	"emp-app/pkg/helpers/hash"
 	"net/http"
 )
 
@@ -36,6 +37,16 @@ func (s *EmployeeServiceImpl) CreateEmployee(r *http.Request) (*domain.Employee,
 	if err := body.Validate(); err != nil {
 		return nil, e.NewError(e.ErrValidateRequest, "can't validate employee create request", err)
 	}
+
+	// Password hashing
+	password, err := hash.HashPassword(body.Password)
+
+	if err != nil {
+		return nil, e.NewError(e.ErrInternalServer, "password hashing error", err)
+	}
+
+	// Passing hashed password to body
+	body.Password = password
 	emp, err := s.empRepo.CreateEmployee(body)
 
 	if err != nil {
