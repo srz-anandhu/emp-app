@@ -34,21 +34,21 @@ func (s *EmployeeServiceImpl) Login(r *http.Request) (*dto.EmployeeLoginResp, er
 	body := &dto.EmployeeLogin{}
 
 	if err := body.Parse(r); err != nil {
-		return nil, err
+		return nil, e.NewError(e.ErrInvalidRequest, "login request parse error", err)
 	}
 
 	if err := body.Validate(); err != nil {
-		return nil, err
+		return nil, e.NewError(e.ErrValidateRequest, "validate error in login request", err)
 	}
 
 	// Getting existing user by email
 	emp, err := s.empRepo.FindUserByEmail(body.Email)
 	if err != nil {
-		return nil, err
+		return nil, e.NewError(e.ErrResourceNotFound, "user not found with given email.. please signup", err)
 	}
 
 	if err := hash.ComparePassword(body.Password, emp.Password); err != nil {
-		return nil, err
+		return nil, e.NewError(e.ErrInternalServer, "password doesn't match", err)
 	}
 
 	return &dto.EmployeeLoginResp{

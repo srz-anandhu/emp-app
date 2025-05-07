@@ -39,17 +39,17 @@ func NewApiError(err error, msg string) *HTTPError {
 	}
 
 	// checking err is type of WrapError
-	appErr, ok := err.(*WrapError)
-	if ok {
-		appErr.Msg = msg
-	} else {
-		return nil
-	}
+	appErr, _ := err.(*WrapError)
+	// if ok {
+	// 	//appErr.Msg = msg
+	// } else {
+	// 	return nil
+	// }
 
 	httpError := &HTTPError{
 		StatusCode: GetHttpStatusCode(appErr.ErrorCode),
 		Code:       appErr.ErrorCode,
-		Message:    msg,
+		Message:    appErr.Msg,
 	}
 
 	return httpError
