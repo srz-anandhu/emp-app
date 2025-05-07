@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"emp-app/app/domain"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -11,15 +12,15 @@ import (
 )
 
 type EmployeeCreateRequest struct {
-	ID       int       `json:"id"`
-	Name     string    `json:"name"`
-	DOB      string `json:"dob"`
-	Email    string    `json:"email"`
-	Password string    `json:"password"`
-	Phone    string    `json:"phone"`
-	Address  string    `json:"address"`
-	Salary   float64   `json:"salary"`
-	Position string    `json:"position"`
+	ID       int     `json:"id"`
+	Name     string  `json:"name"`
+	DOB      string  `json:"dob"`
+	Email    string  `json:"email"`
+	Password string  `json:"password"`
+	Phone    string  `json:"phone"`
+	Address  string  `json:"address"`
+	Salary   float64 `json:"salary"`
+	Position string  `json:"position"`
 }
 
 func (e *EmployeeCreateRequest) Parse(r *http.Request) error {
@@ -35,6 +36,13 @@ func (e *EmployeeCreateRequest) Validate() error {
 		return err
 	}
 	return nil
+}
+
+// Token
+type Token struct {
+	EmployeeResp domain.Employee
+	AccessToken  string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 type EmployeeLogin struct {
@@ -77,7 +85,7 @@ func (e *EmployeeRequest) Validate(r *http.Request) error {
 // type EmployeeResponse struct {
 // 	ID        int       `json:"id"`
 // 	Name      string    `json:"name"`
-// 	DOB       time.Time `json:"dob"`
+// 	DOB       string    `json:"dob"`
 // 	Email     string    `json:"email"`
 // 	Phone     string    `json:"phone"`
 // 	Address   string    `json:"address"`

@@ -1,8 +1,10 @@
 package jwt
 
 import (
-	"emp-app/app/domain"
+	"emp-app/app/dto"
 	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -15,10 +17,10 @@ type AuthCustomClaims struct {
 }
 
 // Hard coded secret
-var jwtSecret = []byte("token-secret123456")
+var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
 // Generate access token and refresh token
-func GenerateTokens(emp domain.Employee) (string, string, error) {
+func GenerateTokens(emp dto.EmployeeCreateRequest) (string, string, error) {
 	// Access token valid for 15 minutes
 	accessTokenClaims := &AuthCustomClaims{
 		ID:    emp.ID,
@@ -32,6 +34,7 @@ func GenerateTokens(emp domain.Employee) (string, string, error) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessTokenClaims)
 	accessString, err := accessToken.SignedString(jwtSecret)
 
+	log.Println("accesstoken : ", accessString)
 	if err != nil {
 		return "", "", fmt.Errorf("generation of access token failed : %w", err)
 	}
@@ -48,6 +51,7 @@ func GenerateTokens(emp domain.Employee) (string, string, error) {
 
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims)
 	refreshString, err := refreshToken.SignedString(jwtSecret)
+	log.Println("refreshtoken: ", refreshString)
 	if err != nil {
 		return "", "", fmt.Errorf("generation of refresh token failed : %w", err)
 	}

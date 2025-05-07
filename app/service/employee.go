@@ -6,11 +6,12 @@ import (
 	"emp-app/app/repository"
 	"emp-app/pkg/helpers/e"
 	"emp-app/pkg/helpers/hash"
+	"emp-app/pkg/helpers/jwt"
 	"net/http"
 )
 
 type EmployeeService interface {
-	CreateEmployee(r *http.Request) (*domain.Employee, error)
+	CreateEmployee(r *http.Request) (*dto.Token, error)
 	GetEmployee(r *http.Request) (*domain.Employee, error)
 	UpdateEmployee(r *http.Request) error
 	GetAllEmployees(r *http.Request) ([]*domain.Employee, error)
@@ -27,7 +28,7 @@ func NewEmployeeService(empRepo repository.EmployeeRepo) EmployeeService {
 	}
 }
 
-func (s *EmployeeServiceImpl) CreateEmployee(r *http.Request) (*domain.Employee, error) {
+func (s *EmployeeServiceImpl) CreateEmployee(r *http.Request) (*dto.Token, error) {
 
 	body := &dto.EmployeeCreateRequest{}
 	if err := body.Parse(r); err != nil {
@@ -47,13 +48,24 @@ func (s *EmployeeServiceImpl) CreateEmployee(r *http.Request) (*domain.Employee,
 
 	// Passing hashed password to body
 	body.Password = password
+
+	accessToken, refresToken, err := jwt.GenerateTokens(*body)
+	if err != nil {
+		return nil, e.NewError(e.ErrInternalServer, "token generation error", err)
+	}
+
+	// Calling repo function
 	emp, err := s.empRepo.CreateEmployee(body)
 
 	if err != nil {
 		return nil, e.NewError(e.ErrInternalServer, "cant create employee", err)
 	}
 
-	return emp, nil
+	return &dto.Token{
+		EmployeeResp: *emp,
+		AccessToken: accessToken,
+		RefreshToken: refresToken,
+	}, nil
 }
 
 func (s *EmployeeServiceImpl) GetEmployee(r *http.Request) (*domain.Employee, error) {
