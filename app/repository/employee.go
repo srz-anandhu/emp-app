@@ -14,6 +14,7 @@ type EmployeeRepo interface {
 	GetEmployee(empReq *dto.EmployeeRequest) (*domain.Employee, error)
 	UpdateEmployee(empUpdateReq *dto.EmployeeUpdateRequest) error
 	GetAllEmployees() ([]*domain.Employee, error)
+	FindUserByEmail(email string) (*domain.Employee, error)
 }
 
 type EmployeeRepoImpl struct {
@@ -29,6 +30,15 @@ func NewEmployeeRepo(db *gorm.DB) EmployeeRepo {
 
 // For checking implementation of EmployeeRepo interface
 var _ EmployeeRepo = (*EmployeeRepoImpl)(nil)
+
+func (r *EmployeeRepoImpl) FindUserByEmail(email string) (*domain.Employee, error) {
+	emp := &domain.Employee{}
+	result := r.db.Where("email= ?", email).First(emp)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return emp, nil
+}
 
 func (r *EmployeeRepoImpl) CreateEmployee(createReq *dto.EmployeeCreateRequest) (*domain.Employee, error) {
 	employee := &domain.Employee{

@@ -50,12 +50,28 @@ type EmployeeLogin struct {
 	Password string `json:"password"`
 }
 
+func (e *EmployeeLogin) Parse(r *http.Request) error {
+	if err := json.NewDecoder(r.Body).Decode(&e); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (e *EmployeeLogin) Validate() error {
 	validate := validator.New()
 	if err := validate.Struct(e); err != nil {
 		return err
 	}
 	return nil
+}
+
+type EmployeeLoginResp struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	Position string `json:"position"`
+	Salary   float64 `json:"salary"`
 }
 
 type EmployeeRequest struct {

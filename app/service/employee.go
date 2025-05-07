@@ -15,6 +15,7 @@ type EmployeeService interface {
 	GetEmployee(r *http.Request) (*domain.Employee, error)
 	UpdateEmployee(r *http.Request) error
 	GetAllEmployees(r *http.Request) ([]*domain.Employee, error)
+	Login(r *http.Request) (*dto.EmployeeLoginResp, error)
 }
 
 type EmployeeServiceImpl struct {
@@ -26,6 +27,37 @@ func NewEmployeeService(empRepo repository.EmployeeRepo) EmployeeService {
 	return &EmployeeServiceImpl{
 		empRepo: empRepo,
 	}
+}
+
+func (s *EmployeeServiceImpl) Login(r *http.Request) (*dto.EmployeeLoginResp, error) {
+
+	body := &dto.EmployeeLogin{}
+
+	if err := body.Parse(r); err != nil {
+		return nil, err
+	}
+
+	if err := body.Validate(); err != nil {
+		return nil, err
+	}
+
+	// Getting existing user by email
+	emp, err := s.empRepo.FindUserByEmail(body.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := hash.ComparePassword(body.Password, emp.Password); err != nil {
+		return nil, err
+	}
+
+	return &dto.EmployeeLoginResp{
+		Name:     emp.Name,
+		Email:    emp.Email,
+		Phone:    emp.Phone,
+		Position: emp.Position,
+		Salary:   emp.Salary,
+	}, nil
 }
 
 func (s *EmployeeServiceImpl) CreateEmployee(r *http.Request) (*dto.Token, error) {
@@ -63,7 +95,7 @@ func (s *EmployeeServiceImpl) CreateEmployee(r *http.Request) (*dto.Token, error
 
 	return &dto.Token{
 		EmployeeResp: *emp,
-		AccessToken: accessToken,
+		AccessToken:  accessToken,
 		RefreshToken: refresToken,
 	}, nil
 }
