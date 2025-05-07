@@ -65,6 +65,7 @@ func startHTTPServer(s *http.Server) {
 			os.Exit(1)
 		}
 
+		log.Println("server shutdown successfully")
 		close(shutDownComplete)
 
 	}()

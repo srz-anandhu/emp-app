@@ -30,7 +30,6 @@ func NewEmployeeRepo(db *gorm.DB) EmployeeRepo {
 // For checking implementation of EmployeeRepo interface
 var _ EmployeeRepo = (*EmployeeRepoImpl)(nil)
 
-
 func (r *EmployeeRepoImpl) CreateEmployee(createReq *dto.EmployeeCreateRequest) (*domain.Employee, error) {
 	employee := &domain.Employee{
 		Name:     createReq.Name,
@@ -56,6 +55,9 @@ func (r *EmployeeRepoImpl) GetEmployee(empReq *dto.EmployeeRequest) (*domain.Emp
 
 	result := r.db.Where("id = ?", empReq.ID).First(emp)
 	if result.Error != nil {
+		// if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		// 	return nil, fmt.Errorf("resource not found")
+		// }
 		return nil, result.Error
 	}
 	return emp, nil
@@ -67,7 +69,7 @@ func (r *EmployeeRepoImpl) UpdateEmployee(empUpdateReq *dto.EmployeeUpdateReques
 		"name":       empUpdateReq.Name,
 		"dob":        empUpdateReq.DOB,
 		"email":      empUpdateReq.Email,
-		"password": empUpdateReq.Password,
+		"password":   empUpdateReq.Password,
 		"phone":      empUpdateReq.Phone,
 		"address":    empUpdateReq.Address,
 		"position":   empUpdateReq.Position,
