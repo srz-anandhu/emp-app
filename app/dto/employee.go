@@ -15,8 +15,8 @@ type EmployeeCreateRequest struct {
 	ID       int     `json:"id"`
 	Name     string  `json:"name"`
 	DOB      string  `json:"dob"`
-	Email    string  `json:"email"`
-	Password string  `json:"password"`
+	Email    string  `json:"email" validate:"required"`
+	Password string  `json:"password" validate:"required"`
 	Phone    string  `json:"phone"`
 	Address  string  `json:"address"`
 	Salary   float64 `json:"salary"`
@@ -67,10 +67,10 @@ func (e *EmployeeLogin) Validate() error {
 }
 
 type EmployeeLoginResp struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Position string `json:"position"`
+	Name     string  `json:"name"`
+	Email    string  `json:"email"`
+	Phone    string  `json:"phone"`
+	Position string  `json:"position"`
 	Salary   float64 `json:"salary"`
 }
 
