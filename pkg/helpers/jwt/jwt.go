@@ -4,11 +4,20 @@ import (
 	"emp-app/app/dto"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 )
+
+// To blacklist tokens
+var BlackListedTokens = make(map[string]bool)
+
+// For safe read/writing
+var mu sync.RWMutex
 
 type AuthCustomClaims struct {
 	ID    int    `json:"id"`
@@ -58,4 +67,29 @@ func GenerateTokens(emp dto.EmployeeCreateRequest) (string, string, error) {
 
 	return accessString, refreshString, nil
 
+}
+
+// For blacklisting token
+func BlackListToken(token string) {
+	mu.Lock()
+	defer mu.Unlock()
+	BlackListedTokens[token] = true
+}
+
+// Check token blacklisted or not
+func IsTokenBlackListed(token string) bool {
+	mu.RLock()
+	defer mu.RUnlock()
+	return BlackListedTokens[token]
+}
+
+// Get Token from authorization header
+func ExtractTokenFromHeader(r *http.Request) string {
+	token := r.Header.Get("Authorization")
+
+	if strings.HasPrefix(token, "Bearer ") {
+		return strings.TrimPrefix(token, "Bearer ")
+	}
+
+	return token
 }
