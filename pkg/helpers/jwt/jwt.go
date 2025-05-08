@@ -25,8 +25,8 @@ type AuthCustomClaims struct {
 	jwt.StandardClaims
 }
 
-// Hard coded secret
-var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
+// JWT secret string
+var JwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
 // Generate access token and refresh token
 func GenerateTokens(emp dto.EmployeeCreateRequest) (string, string, error) {
@@ -41,7 +41,7 @@ func GenerateTokens(emp dto.EmployeeCreateRequest) (string, string, error) {
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessTokenClaims)
-	accessString, err := accessToken.SignedString(jwtSecret)
+	accessString, err := accessToken.SignedString(JwtSecret)
 
 	log.Println("accesstoken : ", accessString)
 	if err != nil {
@@ -59,7 +59,7 @@ func GenerateTokens(emp dto.EmployeeCreateRequest) (string, string, error) {
 	}
 
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims)
-	refreshString, err := refreshToken.SignedString(jwtSecret)
+	refreshString, err := refreshToken.SignedString(JwtSecret)
 	log.Println("refreshtoken: ", refreshString)
 	if err != nil {
 		return "", "", fmt.Errorf("generation of refresh token failed : %w", err)
