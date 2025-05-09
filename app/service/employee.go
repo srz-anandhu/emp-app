@@ -15,7 +15,7 @@ type EmployeeService interface {
 	GetEmployee(r *http.Request) (*domain.Employee, error)
 	UpdateEmployee(r *http.Request) error
 	GetAllEmployees(r *http.Request) ([]*domain.Employee, error)
-	Login(r *http.Request) (*dto.EmployeeLoginResp, error)
+	Login(r *http.Request) (*dto.LoginToken, error)
 }
 
 type EmployeeServiceImpl struct {
@@ -29,11 +29,12 @@ func NewEmployeeService(empRepo repository.EmployeeRepo) EmployeeService {
 	}
 }
 
-func (s *EmployeeServiceImpl) Login(r *http.Request) (*dto.EmployeeLoginResp, error) {
+func (s *EmployeeServiceImpl) Login(r *http.Request) (*dto.LoginToken, error) {
 
 	body := &dto.EmployeeLogin{}
 
-	if err := body.Parse(r); err != nil {
+
+ 	if err := body.Parse(r); err != nil {
 		return nil, e.NewError(e.ErrInvalidRequest, "login request parse error", err)
 	}
 
@@ -50,13 +51,24 @@ func (s *EmployeeServiceImpl) Login(r *http.Request) (*dto.EmployeeLoginResp, er
 	if err := hash.ComparePassword(body.Password, emp.Password); err != nil {
 		return nil, e.NewError(e.ErrInternalServer, "password doesn't match", err)
 	}
+	accessToken, refreshToken, err := jwt.GenerateTokens(body.Email)
+	if err != nil {
+		return nil, e.NewError(e.ErrInternalServer, "token generation error", err)
+	}
 
-	return &dto.EmployeeLoginResp{
-		Name:     emp.Name,
-		Email:    emp.Email,
-		Phone:    emp.Phone,
+	empRes := &dto.EmployeeLoginResp{
+		Name: emp.Name,
+		Email: emp.Name,
+		Phone: emp.Phone,
 		Position: emp.Position,
-		Salary:   emp.Salary,
+		Salary: emp.Salary,
+	}
+
+	return &dto.LoginToken{
+		EmpResp: *empRes,
+		AccessToken: accessToken,
+		RefreshToken: refreshToken,
+
 	}, nil
 }
 
@@ -71,6 +83,14 @@ func (s *EmployeeServiceImpl) CreateEmployee(r *http.Request) (*dto.Token, error
 		return nil, e.NewError(e.ErrValidateRequest, "can't validate employee create request", err)
 	}
 
+	// existingEmp, err := s.empRepo.FindUserByEmail(body.Email)
+	// if err != nil {
+	// 	// add existing code for emp signup
+	// }
+	// if body.Email == existingEmp.Email {
+	// 	return nil, e.NewError(e.ErrInvalidRequest, "employee already signed-in..please login", err)
+	// }
+
 	// Password hashing
 	password, err := hash.HashPassword(body.Password)
 
@@ -81,7 +101,7 @@ func (s *EmployeeServiceImpl) CreateEmployee(r *http.Request) (*dto.Token, error
 	// Passing hashed password to body
 	body.Password = password
 
-	accessToken, refresToken, err := jwt.GenerateTokens(*body)
+	accessToken, refresToken, err := jwt.GenerateTokens(body.Email)
 	if err != nil {
 		return nil, e.NewError(e.ErrInternalServer, "token generation error", err)
 	}

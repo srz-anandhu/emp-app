@@ -66,6 +66,12 @@ func (e *EmployeeLogin) Validate() error {
 	return nil
 }
 
+type LoginToken struct {
+	EmpResp      EmployeeLoginResp
+	AccessToken  string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
 type EmployeeLoginResp struct {
 	Name     string  `json:"name"`
 	Email    string  `json:"email"`

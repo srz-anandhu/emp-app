@@ -1,7 +1,6 @@
 package jwt
 
 import (
-	"emp-app/app/dto"
 	"fmt"
 	"log"
 	"net/http"
@@ -29,11 +28,11 @@ type AuthCustomClaims struct {
 var JwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
 // Generate access token and refresh token
-func GenerateTokens(emp dto.EmployeeCreateRequest) (string, string, error) {
+func GenerateTokens(email string) (string, string, error) {
 	// Access token valid for 15 minutes
 	accessTokenClaims := &AuthCustomClaims{
-		ID:    emp.ID,
-		Email: emp.Email,
+
+		Email: email,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(15 * time.Minute).Unix(),
 			IssuedAt:  time.Now().Unix(),
@@ -50,8 +49,7 @@ func GenerateTokens(emp dto.EmployeeCreateRequest) (string, string, error) {
 
 	// Refresh token valid for 7 days
 	refreshTokenClaims := &AuthCustomClaims{
-		ID:    emp.ID,
-		Email: emp.Email,
+		Email: email,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(7 * 24 * time.Hour).Unix(),
 			IssuedAt:  time.Now().Unix(),
