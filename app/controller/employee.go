@@ -13,6 +13,7 @@ type EmployeeController interface {
 	UpdateEmployee(w http.ResponseWriter, r *http.Request)
 	GetAllEmployees(w http.ResponseWriter, r *http.Request)
 	Login(w http.ResponseWriter, r *http.Request)
+	Logout(w http.ResponseWriter, r *http.Request)
 }
 
 type EmployeeControllerImpl struct {
@@ -35,6 +36,15 @@ func (c *EmployeeControllerImpl) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response.Success(w, http.StatusOK, result)
+}
+
+func (c *EmployeeControllerImpl) Logout(w http.ResponseWriter, r *http.Request) {
+	if err := c.empService.Logout(r); err != nil {
+		httpErr := e.NewApiError(err, "can't blacklist token")
+		response.Fail(w, httpErr.StatusCode, httpErr.Code, httpErr.Message, err.Error())
+		return
+	}
+	response.Success(w, http.StatusOK, "logout successfully...")
 }
 
 func (c *EmployeeControllerImpl) CreateEmployee(w http.ResponseWriter, r *http.Request) {

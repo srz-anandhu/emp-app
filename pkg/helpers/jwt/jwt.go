@@ -68,10 +68,11 @@ func GenerateTokens(email string) (string, string, error) {
 }
 
 // For blacklisting token
-func BlackListToken(token string) {
+func BlackListToken(token string) error {
 	mu.Lock()
 	defer mu.Unlock()
 	BlackListedTokens[token] = true
+	return nil
 }
 
 // Check token blacklisted or not

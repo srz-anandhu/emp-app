@@ -7,6 +7,7 @@ import (
 	"emp-app/pkg/helpers/e"
 	"emp-app/pkg/helpers/hash"
 	"emp-app/pkg/helpers/jwt"
+	jwtpackage "emp-app/pkg/helpers/jwt"
 	"net/http"
 )
 
@@ -16,6 +17,7 @@ type EmployeeService interface {
 	UpdateEmployee(r *http.Request) error
 	GetAllEmployees(r *http.Request) ([]*domain.Employee, error)
 	Login(r *http.Request) (*dto.LoginToken, error)
+	Logout(r *http.Request) error
 }
 
 type EmployeeServiceImpl struct {
@@ -29,12 +31,20 @@ func NewEmployeeService(empRepo repository.EmployeeRepo) EmployeeService {
 	}
 }
 
+func (s *EmployeeServiceImpl) Logout(r *http.Request) error {
+	// Extract token from request header
+	token := jwtpackage.ExtractTokenFromHeader(r)
+	if err := jwtpackage.BlackListToken(token); err != nil {
+		return e.NewError(e.ErrInternalServer, "token blacklisting failed", err)
+	}
+	return nil
+}
+
 func (s *EmployeeServiceImpl) Login(r *http.Request) (*dto.LoginToken, error) {
 
 	body := &dto.EmployeeLogin{}
 
-
- 	if err := body.Parse(r); err != nil {
+	if err := body.Parse(r); err != nil {
 		return nil, e.NewError(e.ErrInvalidRequest, "login request parse error", err)
 	}
 
@@ -57,18 +67,17 @@ func (s *EmployeeServiceImpl) Login(r *http.Request) (*dto.LoginToken, error) {
 	}
 
 	empRes := &dto.EmployeeLoginResp{
-		Name: emp.Name,
-		Email: emp.Name,
-		Phone: emp.Phone,
+		Name:     emp.Name,
+		Email:    emp.Name,
+		Phone:    emp.Phone,
 		Position: emp.Position,
-		Salary: emp.Salary,
+		Salary:   emp.Salary,
 	}
 
 	return &dto.LoginToken{
-		EmpResp: *empRes,
-		AccessToken: accessToken,
+		EmpResp:      *empRes,
+		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-
 	}, nil
 }
 
