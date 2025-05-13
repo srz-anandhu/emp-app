@@ -19,7 +19,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		// Checking token blacklisted or not
 		if jwtpackage.IsTokenBlackListed(tokenString) {
-			http.Error(w, "blacklisted token", http.StatusUnauthorized)
+			http.Error(w, "user need to login..(blacklisted token)", http.StatusUnauthorized)
 			return
 		}
 

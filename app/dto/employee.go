@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	validator "github.com/go-playground/validator/v10"
@@ -118,15 +117,15 @@ func (e *EmployeeRequest) Validate(r *http.Request) error {
 // }
 
 type EmployeeUpdateRequest struct {
-	ID       int       `json:"id"`
-	Name     string    `json:"name"`
-	DOB      time.Time `json:"dob"`
-	Email    string    `json:"email"`
-	Password string    `json:"password"`
-	Phone    string    `json:"phone"`
-	Address  string    `json:"address"`
-	Salary   float64   `json:"salary"`
-	Position string    `json:"position"`
+	ID       int      `json:"id"`
+	Name     *string  `json:"name"`
+	DOB      *string  `json:"dob"`
+	Email    *string  `json:"email"`
+	Password *string  `json:"password"`
+	Phone    *string  `json:"phone"`
+	Address  *string  `json:"address"`
+	Salary   *float64 `json:"salary"`
+	Position *string  `json:"position"`
 }
 
 func (e *EmployeeUpdateRequest) Parse(r *http.Request) error {
@@ -140,7 +139,7 @@ func (e *EmployeeUpdateRequest) Parse(r *http.Request) error {
 	e.ID = intID
 
 	// Decode to EmployeeUpdateRequest
-	if err := json.NewDecoder(r.Body).Decode(&e); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(e); err != nil {
 		return err
 	}
 
@@ -149,7 +148,7 @@ func (e *EmployeeUpdateRequest) Parse(r *http.Request) error {
 
 func (e *EmployeeUpdateRequest) Validate() error {
 	validate := validator.New()
-	if err := validate.Struct(&e); err != nil {
+	if err := validate.Struct(e); err != nil {
 		return err
 	}
 	return nil
