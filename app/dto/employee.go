@@ -11,15 +11,15 @@ import (
 )
 
 type EmployeeCreateRequest struct {
-	ID       int     `json:"id"`
-	Name     string  `json:"name"`
-	DOB      string  `json:"dob"`
-	Email    string  `json:"email" validate:"required"`
-	Password string  `json:"password" validate:"required"`
-	Phone    string  `json:"phone"`
-	Address  string  `json:"address"`
+	ID       int         `json:"id"`
+	Name     string      `json:"name"`
+	DOB      string      `json:"dob"`
+	Email    string      `json:"email" validate:"required"`
+	Password string      `json:"password" validate:"required"`
+	Phone    string      `json:"phone"`
+	Address  string      `json:"address"`
 	Salary   json.Number `json:"salary"`
-	Position string  `json:"position"`
+	Position string      `json:"position"`
 }
 
 func (e *EmployeeCreateRequest) Parse(r *http.Request) error {
@@ -72,10 +72,12 @@ type LoginToken struct {
 }
 
 type EmployeeLoginResp struct {
-	Name     string  `json:"name"`
-	Email    string  `json:"email"`
-	Phone    string  `json:"phone"`
-	Position string  `json:"position"`
+	Name     string      `json:"name"`
+	Email    string      `json:"email"`
+	Dob      string      `json:"dob"`
+	Address  string      `json:"address"`
+	Phone    string      `json:"phone"`
+	Position string      `json:"position"`
 	Salary   json.Number `json:"salary"`
 }
 

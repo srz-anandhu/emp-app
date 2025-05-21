@@ -68,7 +68,9 @@ func (s *EmployeeServiceImpl) Login(r *http.Request) (*dto.LoginToken, error) {
 
 	empRes := &dto.EmployeeLoginResp{
 		Name:     emp.Name,
-		Email:    emp.Name,
+		Email:    emp.Email,
+		Address: emp.Address,
+		Dob: emp.DOB,
 		Phone:    emp.Phone,
 		Position: emp.Position,
 		Salary:   emp.Salary,
