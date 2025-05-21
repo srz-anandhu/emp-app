@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Employee struct {
 	ID           int       `gorm:"primaryKey;autoIncrement"`
@@ -10,7 +13,7 @@ type Employee struct {
 	Password     string    `gorm:"column:password"`
 	Phone        string    `gorm:"column:phone"`
 	Address      string    `gorm:"column:address"`
-	Salary       float64   `gorm:"column:salary"`
+	Salary       json.Number   `gorm:"column:salary"`
 	Position     string    `gorm:"column:position"`
 	CreatedAt    time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt    time.Time `gorm:"column:updated_at"`

@@ -7,6 +7,7 @@ import (
 	"emp-app/middleware"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"gorm.io/gorm"
 )
 
@@ -18,6 +19,12 @@ func ApiRoute(db *gorm.DB) chi.Router {
 	empController := controller.NewEmployeeController(empService)
 
 	r := chi.NewRouter()
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{"*"} ,
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTION"},
+		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowCredentials: true,
+	}))
 
 	r.Route("/employee", func(r chi.Router) {
 		r.Post("/signup", empController.CreateEmployee)

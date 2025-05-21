@@ -18,7 +18,7 @@ type EmployeeCreateRequest struct {
 	Password string  `json:"password" validate:"required"`
 	Phone    string  `json:"phone"`
 	Address  string  `json:"address"`
-	Salary   float64 `json:"salary"`
+	Salary   json.Number `json:"salary"`
 	Position string  `json:"position"`
 }
 
@@ -76,7 +76,7 @@ type EmployeeLoginResp struct {
 	Email    string  `json:"email"`
 	Phone    string  `json:"phone"`
 	Position string  `json:"position"`
-	Salary   float64 `json:"salary"`
+	Salary   json.Number `json:"salary"`
 }
 
 type EmployeeRequest struct {
