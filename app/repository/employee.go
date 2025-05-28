@@ -33,6 +33,16 @@ var _ EmployeeRepo = (*EmployeeRepoImpl)(nil)
 
 func (r *EmployeeRepoImpl) FindUserByEmail(email string) (*domain.Employee, error) {
 	emp := &domain.Employee{}
+	// Get underlying sql.DB for connection management
+	sqlDB, err := r.db.DB()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get database connection: %w", err)
+	}
+
+	// Verify connection is alive
+	if err := sqlDB.Ping(); err != nil {
+		return nil, fmt.Errorf("database connection error: %w", err)
+	}
 	result := r.db.Where("email= ?", email).First(emp)
 	if result.Error != nil {
 		return nil, result.Error
@@ -76,10 +86,11 @@ func (r *EmployeeRepoImpl) GetEmployee(empReq *dto.EmployeeRequest) (*domain.Emp
 func (r *EmployeeRepoImpl) UpdateEmployee(empUpdateReq *dto.EmployeeUpdateRequest) error {
 	result := r.db.Table("employees").Where("id = ?", empUpdateReq.ID).Updates(map[string]any{
 
-		"name":       empUpdateReq.Name,
-		"dob":        empUpdateReq.DOB,
-		"email":      empUpdateReq.Email,
-		"password":   empUpdateReq.Password,
+		"name":  empUpdateReq.Name,
+		"dob":   empUpdateReq.DOB,
+		"email": empUpdateReq.Email,
+		// "current_password": empUpdateReq.CurrentPassword,
+		"password":   empUpdateReq.NewPassword,
 		"phone":      empUpdateReq.Phone,
 		"address":    empUpdateReq.Address,
 		"position":   empUpdateReq.Position,

@@ -21,7 +21,7 @@ func ApiRoute(db *gorm.DB) chi.Router {
 	r := chi.NewRouter()
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{"*"} ,
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTION"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: true,
 	}))

@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"github.com/joho/godotenv"
 )
 
 func DBConnection() (*gorm.DB, *sql.DB, error) {
@@ -45,7 +46,12 @@ func DBConnection() (*gorm.DB, *sql.DB, error) {
 		log.Fatal(err)
 	}
 
-	log.Println("Conntected to Database successfully....")
+	// Configure connection pool
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	log.Println("Connected to Database successfully....")
 
 	return gDB, sqlDB, nil
 

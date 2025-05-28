@@ -15,3 +15,6 @@ func AutoMigrateModels(db *gorm.DB) error {
 	log.Println("migration successfull...")
 	return nil
 }
+
+
+// Seed admin in DB

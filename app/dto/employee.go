@@ -72,6 +72,7 @@ type LoginToken struct {
 }
 
 type EmployeeLoginResp struct {
+	ID       int         `json:"id"`
 	Name     string      `json:"name"`
 	Email    string      `json:"email"`
 	Dob      string      `json:"dob"`
@@ -119,15 +120,16 @@ func (e *EmployeeRequest) Validate(r *http.Request) error {
 // }
 
 type EmployeeUpdateRequest struct {
-	ID       int      `json:"id"`
-	Name     *string  `json:"name"`
-	DOB      *string  `json:"dob"`
-	Email    *string  `json:"email"`
-	Password *string  `json:"password"`
-	Phone    *string  `json:"phone"`
-	Address  *string  `json:"address"`
-	Salary   *float64 `json:"salary"`
-	Position *string  `json:"position"`
+	ID              int          `json:"id"`
+	Name            *string      `json:"name"`
+	DOB             *string      `json:"dob"`
+	Email           *string      `json:"email"`
+	CurrentPassword *string      `json:"current_password"`
+	NewPassword     string       `json:"new_password"`
+	Phone           *string      `json:"phone"`
+	Address         *string      `json:"address"`
+	Salary          *json.Number `json:"salary"`
+	Position        *string      `json:"position"`
 }
 
 func (e *EmployeeUpdateRequest) Parse(r *http.Request) error {
