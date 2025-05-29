@@ -6,9 +6,7 @@ import (
 	"emp-app/app/repository"
 	"emp-app/pkg/helpers/e"
 	"emp-app/pkg/helpers/hash"
-	"emp-app/pkg/helpers/jwt"
 	jwtpackage "emp-app/pkg/helpers/jwt"
-	"fmt"
 	"net/http"
 )
 
@@ -68,9 +66,10 @@ func (s *EmployeeServiceImpl) Login(r *http.Request) (*dto.LoginToken, error) {
 	}
 
 	empRes := &dto.EmployeeLoginResp{
-		ID: emp.ID,
+		ID:       emp.ID,
 		Name:     emp.Name,
 		Email:    emp.Email,
+		Password: emp.Password,
 		Address:  emp.Address,
 		Dob:      emp.DOB,
 		Phone:    emp.Phone,
@@ -114,7 +113,7 @@ func (s *EmployeeServiceImpl) CreateEmployee(r *http.Request) (*dto.Token, error
 	// Passing hashed password to body
 	body.Password = password
 
-	accessToken, refresToken, err := jwt.GenerateTokens(body.Email)
+	accessToken, refresToken, err := jwtpackage.GenerateTokens(body.Email)
 	if err != nil {
 		return nil, e.NewError(e.ErrInternalServer, "token generation error", err)
 	}
@@ -153,6 +152,7 @@ func (s *EmployeeServiceImpl) GetEmployee(r *http.Request) (*domain.Employee, er
 	employee.ID = emp.ID
 	employee.Name = emp.Name
 	employee.Email = emp.Email
+	employee.Password = emp.Password
 	employee.Address = emp.Address
 	employee.DOB = emp.DOB
 	employee.Phone = emp.Phone
@@ -167,7 +167,7 @@ func (s *EmployeeServiceImpl) GetEmployee(r *http.Request) (*domain.Employee, er
 func (s *EmployeeServiceImpl) UpdateEmployee(r *http.Request) error {
 
 	body := &dto.EmployeeUpdateRequest{}
-
+	
 	if err := body.Parse(r); err != nil {
 		return e.NewError(e.ErrDecodeRequestBody, "can't decode employee update request", err)
 	}
@@ -175,29 +175,6 @@ func (s *EmployeeServiceImpl) UpdateEmployee(r *http.Request) error {
 	if err := body.Validate(); err != nil {
 		return e.NewError(e.ErrValidateRequest, "can't validate employee update request", err)
 	}
-
-	existingEmp, err := s.empRepo.FindUserByEmail(*body.Email)
-	if err != nil {
-		return e.NewError(e.ErrResourceNotFound, "no user found", err)
-	}
-
-	if *body.CurrentPassword == ""  {
-		return fmt.Errorf("current password required for password changing")
-	}
-
-	if err := hash.ComparePassword(*body.CurrentPassword, existingEmp.Password); err != nil {
-		return e.NewError(e.ErrInternalServer, "password doesn't match", err)
-	}
-
-	// Hash new password
-	newHashedPass, err := hash.HashPassword(body.NewPassword)
-	if err != nil {
-		return e.NewError(e.ErrInternalServer, "hashing new password failed", err)
-	}
-
-	// Setting new password for employee
-	body.NewPassword = newHashedPass
-	existingEmp.Password = body.NewPassword
 
 	if err := s.empRepo.UpdateEmployee(body); err != nil {
 		return e.NewError(e.ErrInternalServer, "update employee failed", err)

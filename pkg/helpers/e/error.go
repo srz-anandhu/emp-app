@@ -18,7 +18,13 @@ type HTTPError struct {
 }
 
 func (e *WrapError) Error() string {
-	return e.RootCause.Error()
+	if e == nil {
+		return "<nil>"
+	}
+	if e.RootCause != nil {
+		return e.Msg + ": " + e.RootCause.Error()
+	}
+	return e.Msg
 }
 
 // NewError : creates a new error instance, get rootcause error and return as WrapError.
@@ -38,18 +44,27 @@ func NewApiError(err error, msg string) *HTTPError {
 		return nil
 	}
 
-	// checking err is type of WrapError
-	appErr, _ := err.(*WrapError)
-	// if ok {
-	// 	//appErr.Msg = msg
-	// } else {
-	// 	return nil
-	// }
+	var errorCode int
+	var errorMsg string
 
+	if wrapErr, ok := err.(*WrapError); ok {
+		errorCode = wrapErr.ErrorCode
+		if msg != "" {
+			errorMsg = msg
+		} else {
+			errorMsg = wrapErr.Msg
+		}
+	} else {
+		errorCode = ErrInternalServer 
+		errorMsg = err.Error()
+		if msg != "" {
+			errorMsg = msg + ": " + errorMsg
+		}
+	}
 	httpError := &HTTPError{
-		StatusCode: GetHttpStatusCode(appErr.ErrorCode),
-		Code:       appErr.ErrorCode,
-		Message:    appErr.Msg,
+		StatusCode: GetHttpStatusCode(errorCode),
+		Code:       errorCode,
+		Message:    errorMsg,
 	}
 
 	return httpError

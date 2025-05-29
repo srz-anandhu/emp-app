@@ -90,7 +90,7 @@ func (r *EmployeeRepoImpl) UpdateEmployee(empUpdateReq *dto.EmployeeUpdateReques
 		"dob":   empUpdateReq.DOB,
 		"email": empUpdateReq.Email,
 		// "current_password": empUpdateReq.CurrentPassword,
-		"password":   empUpdateReq.NewPassword,
+		"password":   empUpdateReq.Password,
 		"phone":      empUpdateReq.Phone,
 		"address":    empUpdateReq.Address,
 		"position":   empUpdateReq.Position,
