@@ -12,6 +12,7 @@ type EmployeeController interface {
 	GetEmployee(w http.ResponseWriter, r *http.Request)
 	UpdateEmployee(w http.ResponseWriter, r *http.Request)
 	GetAllEmployees(w http.ResponseWriter, r *http.Request)
+	ChangePassword(w http.ResponseWriter, r *http.Request)
 	Login(w http.ResponseWriter, r *http.Request)
 	Logout(w http.ResponseWriter, r *http.Request)
 }
@@ -87,4 +88,13 @@ func (c *EmployeeControllerImpl) GetAllEmployees(w http.ResponseWriter, r *http.
 	}
 
 	response.Success(w, http.StatusOK, results)
+}
+
+func (c *EmployeeControllerImpl) ChangePassword(w http.ResponseWriter, r *http.Request) {
+	if err := c.empService.ChangePassword(r); err != nil {
+		httpErr := e.NewApiError(err, "cant change password")
+		response.Fail(w, httpErr.StatusCode, httpErr.Code, httpErr.Message, err.Error())
+		return
+	}
+	response.Success(w, http.StatusOK, "password changed successfully")
 }

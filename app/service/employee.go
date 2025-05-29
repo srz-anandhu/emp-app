@@ -17,6 +17,7 @@ type EmployeeService interface {
 	GetAllEmployees(r *http.Request) ([]*domain.Employee, error)
 	Login(r *http.Request) (*dto.LoginToken, error)
 	Logout(r *http.Request) error
+	ChangePassword(r *http.Request) error
 }
 
 type EmployeeServiceImpl struct {
@@ -167,7 +168,7 @@ func (s *EmployeeServiceImpl) GetEmployee(r *http.Request) (*domain.Employee, er
 func (s *EmployeeServiceImpl) UpdateEmployee(r *http.Request) error {
 
 	body := &dto.EmployeeUpdateRequest{}
-	
+
 	if err := body.Parse(r); err != nil {
 		return e.NewError(e.ErrDecodeRequestBody, "can't decode employee update request", err)
 	}
@@ -214,4 +215,49 @@ func (s *EmployeeServiceImpl) GetAllEmployees(r *http.Request) ([]*domain.Employ
 
 	return employees, nil
 
+}
+
+func (s *EmployeeServiceImpl) ChangePassword(r *http.Request) error {
+
+	passChangeReq := &dto.EmployeePassChange{}
+
+	if err := passChangeReq.Parse(r); err != nil {
+		return e.NewError(e.ErrInvalidRequest, "password change req body parse error", err)
+	}
+	if err := passChangeReq.Validate(); err != nil {
+		return e.NewError(e.ErrValidateRequest, "validation error", err)
+	}
+
+	// Get the current hashed password from DB
+	password, err := s.empRepo.GetPasswordFromID(&dto.EmployeePassRequest{ID: passChangeReq.ID})
+	if err != nil {
+		return e.NewError(e.ErrInternalServer, "password getting error", err)
+	}
+
+	// Compare current password
+	if err := hash.ComparePassword(passChangeReq.CurrentPassword, password); err != nil {
+		return e.NewError(e.ErrInternalServer, "password doesn't match", err)
+	}
+	
+	// Ensure new password and confirm password match
+	if passChangeReq.NewPassword == nil || passChangeReq.ConfirmPassword == nil || 
+		*passChangeReq.NewPassword != *passChangeReq.ConfirmPassword {
+		return e.NewError(e.ErrInvalidRequest, "new and confirm password do not match", nil)
+		}
+	
+
+	// Hash new password
+	hashedNewPass, err := hash.HashPassword(*passChangeReq.NewPassword)
+	if err != nil {
+		return e.NewError(e.ErrInternalServer, "failed to hash new password", err)
+	}
+
+	// Set hashed password and call repository to update
+	passChangeReq.NewPassword = &hashedNewPass
+	
+	if err := s.empRepo.ChangePassword(passChangeReq); err != nil {
+		return e.NewError(e.ErrInternalServer, "password changing failed", err)
+	}
+
+	return nil
 }

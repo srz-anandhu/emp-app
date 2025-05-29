@@ -121,13 +121,10 @@ func (e *EmployeeRequest) Validate(r *http.Request) error {
 // }
 
 type EmployeeUpdateRequest struct {
-	ID    int     `json:"id"`
-	Name  *string `json:"name"`
-	DOB   *string `json:"dob"`
-	Email *string `json:"email"`
-	// CurrentPassword *string      `json:"current_password"`
-	// NewPassword     string       `json:"new_password"`
-	Password *string      `json:"password"`
+	ID       int          `json:"id"`
+	Name     *string      `json:"name"`
+	DOB      *string      `json:"dob"`
+	Email    *string      `json:"email"`
 	Phone    *string      `json:"phone"`
 	Address  *string      `json:"address"`
 	Salary   *json.Number `json:"salary"`
@@ -153,6 +150,63 @@ func (e *EmployeeUpdateRequest) Parse(r *http.Request) error {
 }
 
 func (e *EmployeeUpdateRequest) Validate() error {
+	validate := validator.New()
+	if err := validate.Struct(e); err != nil {
+		return err
+	}
+	return nil
+}
+
+type EmployeePassRequest struct {
+	ID       int    `json:"id"`
+	Password string `json:"password"`
+}
+
+func (e *EmployeePassRequest) Parse(r *http.Request) error {
+	strID := chi.URLParam(r, "id")
+	intID, err := strconv.Atoi(strID)
+	if err != nil {
+		return err
+	}
+
+	e.ID = intID
+	return nil
+}
+
+func (e *EmployeePassRequest) Validate() error {
+	validate := validator.New()
+	if err := validate.Struct(e); err != nil {
+		return err
+	}
+	return nil
+}
+
+type EmployeePassChange struct {
+	ID              int     `json:"id"`
+	CurrentPassword string  `json:"current_password"`
+	NewPassword     *string `json:"new_password"`
+	ConfirmPassword *string `json:"confirm_password"`
+}
+
+func (e *EmployeePassChange) Parse(r *http.Request) error {
+	// Get ID from Request
+	strID := chi.URLParam(r, "id")
+	intID, err := strconv.Atoi(strID)
+	if err != nil {
+		return err
+	}
+
+	e.ID = intID
+
+	// Decode to EmployeeUpdateRequest
+	if err := json.NewDecoder(r.Body).Decode(e); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (e *EmployeePassChange) Validate() error {
 	validate := validator.New()
 	if err := validate.Struct(e); err != nil {
 		return err
