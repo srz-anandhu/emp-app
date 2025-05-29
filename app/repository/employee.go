@@ -15,6 +15,8 @@ type EmployeeRepo interface {
 	UpdateEmployee(empUpdateReq *dto.EmployeeUpdateRequest) error
 	GetAllEmployees() ([]*domain.Employee, error)
 	FindUserByEmail(email string) (*domain.Employee, error)
+	GetPasswordFromID(empPassReq *dto.EmployeePassRequest) (string, error)
+	ChangePassword(empPassChange *dto.EmployeePassChange) error
 }
 
 type EmployeeRepoImpl struct {
@@ -86,11 +88,9 @@ func (r *EmployeeRepoImpl) GetEmployee(empReq *dto.EmployeeRequest) (*domain.Emp
 func (r *EmployeeRepoImpl) UpdateEmployee(empUpdateReq *dto.EmployeeUpdateRequest) error {
 	result := r.db.Table("employees").Where("id = ?", empUpdateReq.ID).Updates(map[string]any{
 
-		"name":  empUpdateReq.Name,
-		"dob":   empUpdateReq.DOB,
-		"email": empUpdateReq.Email,
-		// "current_password": empUpdateReq.CurrentPassword,
-		"password":   empUpdateReq.Password,
+		"name":       empUpdateReq.Name,
+		"dob":        empUpdateReq.DOB,
+		"email":      empUpdateReq.Email,
 		"phone":      empUpdateReq.Phone,
 		"address":    empUpdateReq.Address,
 		"position":   empUpdateReq.Position,
@@ -117,4 +117,28 @@ func (r *EmployeeRepoImpl) GetAllEmployees() ([]*domain.Employee, error) {
 	}
 
 	return employees, nil
+}
+
+// Get password from employee ID
+func (r *EmployeeRepoImpl) GetPasswordFromID(empReq *dto.EmployeePassRequest) (string, error) {
+	empPass := &dto.EmployeePassRequest{}
+	result := r.db.Table("employees").Select("password").Where("id = ?", empReq.ID).First(empPass)
+	if result.Error != nil {
+		return "", result.Error
+	}
+	return empPass.Password, nil
+}
+
+func (r *EmployeeRepoImpl) ChangePassword(empPassChange *dto.EmployeePassChange) error {
+	if empPassChange.NewPassword == nil {
+		return fmt.Errorf("new password must not be nil")
+	}
+	result := r.db.Table("employees").Where("id =?", empPassChange.ID).Update("password", *empPassChange.NewPassword)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no employee found with ID")
+	}
+	return nil
 }
