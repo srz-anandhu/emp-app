@@ -33,7 +33,7 @@ func ApiRoute(db *gorm.DB) chi.Router {
 		r.With(middleware.AuthMiddleware).Get("/{id}", empController.GetEmployee)
 		r.With(middleware.AuthMiddleware).Get("/", empController.GetAllEmployees)
 		r.With(middleware.AuthMiddleware).Post("/logout", empController.Logout)
-		r.With(middleware.AuthMiddleware).Put("/{id}", empController.ChangePassword)
+		r.With(middleware.AuthMiddleware).Put("/{id}/password", empController.ChangePassword)
 	})
 
 	return r
