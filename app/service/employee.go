@@ -61,7 +61,7 @@ func (s *EmployeeServiceImpl) Login(r *http.Request) (*dto.LoginToken, error) {
 	if err := hash.ComparePassword(body.Password, emp.Password); err != nil {
 		return nil, e.NewError(e.ErrInternalServer, "password doesn't match", err)
 	}
-	accessToken, refreshToken, err := jwtpackage.GenerateTokens(body.Email)
+	accessToken, refreshToken, err := jwtpackage.GenerateTokens(emp.ID, emp.Email, "employee")
 	if err != nil {
 		return nil, e.NewError(e.ErrInternalServer, "token generation error", err)
 	}
@@ -114,7 +114,7 @@ func (s *EmployeeServiceImpl) CreateEmployee(r *http.Request) (*dto.Token, error
 	// Passing hashed password to body
 	body.Password = password
 
-	accessToken, refresToken, err := jwtpackage.GenerateTokens(body.Email)
+	accessToken, refresToken, err := jwtpackage.GenerateTokens(body.ID, body.Email, "employee")
 	if err != nil {
 		return nil, e.NewError(e.ErrInternalServer, "token generation error", err)
 	}
