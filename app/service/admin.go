@@ -37,11 +37,11 @@ func (s *AdminServiceImpl) Login(r *http.Request) (*dto.AdminToken, error) {
 	if err != nil {
 		return nil, e.NewError(e.ErrInternalServer, "no admin found by email", err)
 	}
-	password, err := hash.HashPassword(req.Password)
-	if err != nil {
-		return nil, e.NewError(e.ErrInternalServer, "password hashing failed for admin", err)
-	}
-	if err := hash.ComparePassword(password, admin.Password); err != nil {
+	// password, err := hash.HashPassword(req.Password)
+	// if err != nil {
+	// 	return nil, e.NewError(e.ErrInternalServer, "password hashing failed for admin", err)
+	// }
+	if err := hash.ComparePassword(req.Password, admin.Password); err != nil {
 		return nil, e.NewError(e.ErrInternalServer, "admin password doesnt match", err)
 	}
 	// Generate token
