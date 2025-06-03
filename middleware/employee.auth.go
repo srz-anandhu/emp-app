@@ -23,14 +23,19 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		claims := &jwtpackage.AuthCustomClaims{}
 
-		token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(tokenString, &jwtpackage.AuthCustomClaims{}, func(t *jwt.Token) (interface{}, error) {
 			return jwtpackage.JwtSecret, nil
 		})
 
 		if err != nil || !token.Valid {
 			http.Error(w, "Invalid token or Expired token", http.StatusUnauthorized)
+			return
+		}
+
+		claims, ok := token.Claims.(*jwtpackage.AuthCustomClaims)
+		if !ok || claims.Role != "admin" {
+			http.Error(w, "Forbidden: admin access required", http.StatusForbidden)
 			return
 		}
 

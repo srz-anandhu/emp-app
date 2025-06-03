@@ -18,6 +18,10 @@ func ApiRoute(db *gorm.DB) chi.Router {
 	empService := service.NewEmployeeService(empRepo)
 	empController := controller.NewEmployeeController(empService)
 
+	adminRepo := repository.NewAdminRepo(db)
+	adminService := service.NewAdminService(adminRepo)
+	adminController := controller.NewAdminController(adminService)
+
 	r := chi.NewRouter()
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{"*"} ,
@@ -25,6 +29,10 @@ func ApiRoute(db *gorm.DB) chi.Router {
 		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: true,
 	}))
+
+	r.Route("/admin", func(r chi.Router) {
+		r.Post("/login", adminController.Login)
+	})
 
 	r.Route("/employee", func(r chi.Router) {
 		r.Post("/signup", empController.CreateEmployee)

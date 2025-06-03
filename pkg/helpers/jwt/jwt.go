@@ -21,6 +21,7 @@ var mu sync.RWMutex
 type AuthCustomClaims struct {
 	ID    int    `json:"id"`
 	Email string `json:"email"`
+	Role  string `json:"role"`
 	jwt.StandardClaims
 }
 
@@ -28,11 +29,12 @@ type AuthCustomClaims struct {
 var JwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
 // Generate access token and refresh token
-func GenerateTokens(email string) (string, string, error) {
+func GenerateTokens(id int, email string, role string) (string, string, error) {
 	// Access token valid for 15 minutes
 	accessTokenClaims := &AuthCustomClaims{
-
+		ID: id,
 		Email: email,
+		Role: role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(15 * time.Minute).Unix(),
 			IssuedAt:  time.Now().Unix(),
@@ -49,7 +51,9 @@ func GenerateTokens(email string) (string, string, error) {
 
 	// Refresh token valid for 7 days
 	refreshTokenClaims := &AuthCustomClaims{
+		ID: id,
 		Email: email,
+		Role: role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(7 * 24 * time.Hour).Unix(),
 			IssuedAt:  time.Now().Unix(),
