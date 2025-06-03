@@ -43,6 +43,7 @@ func CheckAndSeedAdmin(db *gorm.DB) error {
 			Name: "admin",
 			Email: "adminemail@gmail.com",
 			Password: hashedPass,
+			Role: "admin",
 		}
 		db.Create(&admin)
 	}

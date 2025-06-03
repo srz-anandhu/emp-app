@@ -5,4 +5,5 @@ type Admin struct {
 	Name     string `gorm:"column:name"`
 	Email    string `gorm:"column:email"`
 	Password string `gorm:"column:password"`
+	Role     string `gorm:"column:role;default:'admin'"`
 }
