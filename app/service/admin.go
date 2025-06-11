@@ -13,6 +13,7 @@ import (
 type AdminService interface {
 	Login(r *http.Request) (*dto.AdminToken, error)
 	AddEmployee (r *http.Request) (*domain.Employee, error)
+	AddAdmin(r *http.Request) (*dto.AdminLoginResponse, error)
 }
 
 type AdminServiceImpl struct {
@@ -96,4 +97,37 @@ func (s *AdminServiceImpl) AddEmployee (r *http.Request) (*domain.Employee, erro
 	}
 
 	return emp, nil
+}
+
+func (s *AdminServiceImpl) AddAdmin(r *http.Request) (*dto.AdminLoginResponse, error) {
+	body := &dto.AdminDetails{}
+
+	if err := body.Parse(r); err != nil {
+		return nil, e.NewError(e.ErrInvalidRequest, "request body parse error ", err)
+	}
+
+	if err := body.Validate(); err != nil {
+		return nil, e.NewError(e.ErrValidateRequest, "request validation error ", err)
+	}
+
+	hashedPass, err := hash.HashPassword(body.Password)
+	if err != nil {
+		return nil, e.NewError(e.ErrInternalServer, "password hashing failed", err)
+	}
+
+	body.Password = hashedPass
+
+	result, err := s.adminRepo.AddNewAdmin(*body)
+	if err != nil {
+		return nil, e.NewError(e.ErrInternalServer, "creating admin failed", err)
+	}
+
+	admin := &dto.AdminLoginResponse{
+		ID: result.ID,
+		Name: result.Name,
+		Email: result.Email,
+		Role: result.Role,
+	}
+
+	return admin, nil
 }
