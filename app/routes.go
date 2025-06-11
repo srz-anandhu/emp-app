@@ -33,6 +33,7 @@ func ApiRoute(db *gorm.DB) chi.Router {
 	r.Route("/admin", func(r chi.Router) {
 		r.Post("/login", adminController.Login)
 		r.With(middleware.AuthMiddleware).Post("/create", adminController.AddEmployee)
+		r.With(middleware.AuthMiddleware).Post("/create-admin", adminController.AddNewAdmin)
 	})
 
 	r.Route("/employee", func(r chi.Router) {
