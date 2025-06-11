@@ -8,7 +8,7 @@ import (
 )
 
 type EmployeeController interface {
-	CreateEmployee(w http.ResponseWriter, r *http.Request)
+	//CreateEmployee(w http.ResponseWriter, r *http.Request)
 	GetEmployee(w http.ResponseWriter, r *http.Request)
 	UpdateEmployee(w http.ResponseWriter, r *http.Request)
 	GetAllEmployees(w http.ResponseWriter, r *http.Request)
@@ -48,16 +48,16 @@ func (c *EmployeeControllerImpl) Logout(w http.ResponseWriter, r *http.Request) 
 	response.Success(w, http.StatusOK, "logout successfully...")
 }
 
-func (c *EmployeeControllerImpl) CreateEmployee(w http.ResponseWriter, r *http.Request) {
-	result, err := c.empService.CreateEmployee(r)
-	if err != nil {
-		httpErr := e.NewApiError(err, "can't create employee")
-		response.Fail(w, httpErr.StatusCode, httpErr.Code, httpErr.Message, err.Error())
-		return
-	}
+// func (c *EmployeeControllerImpl) CreateEmployee(w http.ResponseWriter, r *http.Request) {
+// 	result, err := c.empService.CreateEmployee(r)
+// 	if err != nil {
+// 		httpErr := e.NewApiError(err, "can't create employee")
+// 		response.Fail(w, httpErr.StatusCode, httpErr.Code, httpErr.Message, err.Error())
+// 		return
+// 	}
 
-	response.Success(w, http.StatusCreated, result)
-}
+// 	response.Success(w, http.StatusCreated, result)
+// }
 
 func (c *EmployeeControllerImpl) GetEmployee(w http.ResponseWriter, r *http.Request) {
 	result, err := c.empService.GetEmployee(r)

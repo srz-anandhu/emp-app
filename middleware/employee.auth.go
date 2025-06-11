@@ -18,12 +18,10 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Checking token blacklisted or not
-		if jwtpackage.IsTokenBlackListed(tokenString) {
-			http.Error(w, "user need to login..(blacklisted token)", http.StatusUnauthorized)
-			return
-		}
-
-
+		// if jwtpackage.IsTokenBlackListed(tokenString) {
+		// 	http.Error(w, "user need to login..(blacklisted token)", http.StatusUnauthorized)
+		// 	return
+		// }
 		token, err := jwt.ParseWithClaims(tokenString, &jwtpackage.AuthCustomClaims{}, func(t *jwt.Token) (interface{}, error) {
 			return jwtpackage.JwtSecret, nil
 		})

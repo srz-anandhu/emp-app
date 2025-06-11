@@ -10,7 +10,7 @@ import (
 )
 
 type EmployeeRepo interface {
-	CreateEmployee(createReq *dto.EmployeeCreateRequest) (*domain.Employee, error)
+	//CreateEmployee(createReq *dto.EmployeeCreateRequest) (*domain.Employee, error)
 	GetEmployee(empReq *dto.EmployeeRequest) (*domain.Employee, error)
 	UpdateEmployee(empUpdateReq *dto.EmployeeUpdateRequest) error
 	GetAllEmployees() ([]*domain.Employee, error)
@@ -52,25 +52,25 @@ func (r *EmployeeRepoImpl) FindUserByEmail(email string) (*domain.Employee, erro
 	return emp, nil
 }
 
-func (r *EmployeeRepoImpl) CreateEmployee(createReq *dto.EmployeeCreateRequest) (*domain.Employee, error) {
-	employee := &domain.Employee{
-		Name:     createReq.Name,
-		DOB:      createReq.DOB,
-		Email:    createReq.Email,
-		Password: createReq.Password,
-		Phone:    createReq.Phone,
-		Address:  createReq.Address,
-		Salary:   createReq.Salary,
-		Position: createReq.Position,
-	}
+// func (r *EmployeeRepoImpl) CreateEmployee(createReq *dto.EmployeeCreateRequest) (*domain.Employee, error) {
+// 	employee := &domain.Employee{
+// 		FullName:     createReq.Name,
+// 		DOB:      createReq.DOB,
+// 		Email:    createReq.Email,
+// 		Password: createReq.Password,
+// 		Phone:    createReq.Phone,
+// 		Address:  createReq.Address,
+// 		Salary:   createReq.Salary,
+// 		Position: createReq.Position,
+// 	}
 
-	result := r.db.Create(employee)
-	if result.Error != nil {
-		return nil, result.Error
-	}
+// 	result := r.db.Create(employee)
+// 	if result.Error != nil {
+// 		return nil, result.Error
+// 	}
 
-	return employee, nil
-}
+// 	return employee, nil
+// }
 
 func (r *EmployeeRepoImpl) GetEmployee(empReq *dto.EmployeeRequest) (*domain.Employee, error) {
 	emp := &domain.Employee{}

@@ -32,16 +32,17 @@ func ApiRoute(db *gorm.DB) chi.Router {
 
 	r.Route("/admin", func(r chi.Router) {
 		r.Post("/login", adminController.Login)
+		r.With(middleware.AuthMiddleware).Post("/create", adminController.AddEmployee)
 	})
 
 	r.Route("/employee", func(r chi.Router) {
-		r.Post("/signup", empController.CreateEmployee)
+	//	r.Post("/signup", empController.CreateEmployee)
 		r.Post("/login", empController.Login)
-		r.With(middleware.AuthMiddleware).Put("/{id}", empController.UpdateEmployee)
-		r.With(middleware.AuthMiddleware).Get("/{id}", empController.GetEmployee)
-		r.With(middleware.AuthMiddleware).Get("/", empController.GetAllEmployees)
-		r.With(middleware.AuthMiddleware).Post("/logout", empController.Logout)
-		r.With(middleware.AuthMiddleware).Put("/{id}/password", empController.ChangePassword)
+		r.Put("/{id}", empController.UpdateEmployee)
+		r.Get("/{id}", empController.GetEmployee)
+		r.Get("/", empController.GetAllEmployees)
+		r.Post("/logout", empController.Logout)
+		r.Put("/{id}/password", empController.ChangePassword)
 	})
 
 	return r
