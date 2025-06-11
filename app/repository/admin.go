@@ -11,6 +11,7 @@ import (
 type AdminRepo interface {
 	FindAdminByEmail(email string) (*domain.Admin, error)
 	AddEmployee(empDetails dto.AddEmployeeDetails) (*domain.Employee, error)
+	AddNewAdmin(adminDetails dto.AdminDetails) (*domain.Admin, error)
 }
 
 type AdminRepoImpl struct {
@@ -39,14 +40,14 @@ func (r *AdminRepoImpl) FindAdminByEmail(email string) (*domain.Admin, error) {
 func (r *AdminRepoImpl) AddEmployee(empDetails dto.AddEmployeeDetails) (*domain.Employee, error) {
 	employee := &domain.Employee{
 		EmployeeID: empDetails.EmployeeID,
-		FullName: empDetails.FullName,
-		DOB:      empDetails.DOB,
-		Email:    empDetails.Email,
-		Password: empDetails.Password,
-		Phone:    empDetails.Phone,
-		Address:  empDetails.Address,
-		Salary:   empDetails.Salary,
-		Position: empDetails.Position,
+		FullName:   empDetails.FullName,
+		DOB:        empDetails.DOB,
+		Email:      empDetails.Email,
+		Password:   empDetails.Password,
+		Phone:      empDetails.Phone,
+		Address:    empDetails.Address,
+		Salary:     empDetails.Salary,
+		Position:   empDetails.Position,
 	}
 
 	result := r.db.Create(employee)
@@ -55,4 +56,20 @@ func (r *AdminRepoImpl) AddEmployee(empDetails dto.AddEmployeeDetails) (*domain.
 	}
 
 	return employee, nil
+}
+
+func (r *AdminRepoImpl) AddNewAdmin(adminDetails dto.AdminDetails) (*domain.Admin, error) {
+	admin := &domain.Admin{
+		Name:     adminDetails.Name,
+		Email:    adminDetails.Email,
+		Password: adminDetails.Password,
+		Role:     adminDetails.Role,
+	}
+
+	result := r.db.Create(admin)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return admin, nil
 }

@@ -42,3 +42,27 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 	})
 }
+
+func RequireAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		
+		tokenStr := jwtpackage.ExtractTokenFromHeader(r)
+		if tokenStr == "" || jwtpackage.IsTokenBlackListed(tokenStr) {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		token, err := jwt.ParseWithClaims(tokenStr, &jwtpackage.AuthCustomClaims{}, func(t *jwt.Token) (interface{}, error) {
+			return jwtpackage.JwtSecret, nil
+		})
+
+		if err != nil || !token.Valid {
+			http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
+			return
+		}
+
+		// Valid for any authenticated user (admin or employee)
+		next.ServeHTTP(w, r)
+	})
+}
