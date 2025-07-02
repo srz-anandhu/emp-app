@@ -191,6 +191,7 @@ func (s *EmployeeServiceImpl) GetAllEmployees(r *http.Request) ([]*domain.Employ
 		var emp domain.Employee
 
 		emp.ID = val.ID
+		emp.EmployeeID = val.EmployeeID
 		emp.FullName = val.FullName
 		emp.Email = val.Email
 		emp.Address = val.Address

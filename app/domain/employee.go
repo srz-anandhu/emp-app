@@ -7,7 +7,7 @@ import (
 
 type Employee struct {
 	ID         int         `gorm:"primaryKey;autoIncrement"`
-	EmployeeID string      `gorm:"column:employee_id"`
+	EmployeeID string      `gorm:"column:employee_id;unique"`
 	FullName   string      `gorm:"column:name"`
 	DOB        string      `gorm:"column:dob"`
 	Email      string      `gorm:"column:email"`
