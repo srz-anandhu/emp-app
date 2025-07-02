@@ -32,16 +32,18 @@ func ApiRoute(db *gorm.DB) chi.Router {
 
 	r.Route("/admin", func(r chi.Router) {
 		r.Post("/login", adminController.Login)
+		r.With(middleware.AuthMiddleware).Post("/create", adminController.AddEmployee)
+		r.With(middleware.AuthMiddleware).Post("/create-admin", adminController.AddNewAdmin)
 	})
 
 	r.Route("/employee", func(r chi.Router) {
-		r.Post("/signup", empController.CreateEmployee)
+	//	r.Post("/signup", empController.CreateEmployee)
 		r.Post("/login", empController.Login)
-		r.With(middleware.AuthMiddleware).Put("/{id}", empController.UpdateEmployee)
-		r.With(middleware.AuthMiddleware).Get("/{id}", empController.GetEmployee)
-		r.With(middleware.AuthMiddleware).Get("/", empController.GetAllEmployees)
-		r.With(middleware.AuthMiddleware).Post("/logout", empController.Logout)
-		r.With(middleware.AuthMiddleware).Put("/{id}/password", empController.ChangePassword)
+		r.With(middleware.RequireAuth).Put("/{id}", empController.UpdateEmployee)
+		r.With(middleware.RequireAuth).Get("/{id}", empController.GetEmployee)
+		r.With(middleware.RequireAuth).Get("/", empController.GetAllEmployees)
+		r.With(middleware.RequireAuth).Post("/logout", empController.Logout)
+		r.With(middleware.RequireAuth).Put("/{id}/password", empController.ChangePassword)
 	})
 
 	return r

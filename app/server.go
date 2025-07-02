@@ -33,7 +33,7 @@ const (
 
 func Start(r chi.Router) error {
 	server := http.Server{
-		Addr:              ":8080",
+		Addr:              ":5000",
 		ReadHeaderTimeout: DefaultReadHeaderTimeOut,
 		ReadTimeout:       DefaultReadTimeOut,
 		WriteTimeout:      DefaultWriteTimeOut,
