@@ -5,6 +5,7 @@ import (
 	"emp-app/app/dto"
 	"emp-app/pkg/helpers/e"
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -43,10 +44,13 @@ func (r *AdminRepoImpl) AddEmployee(empDetails dto.AddEmployeeDetails) (*domain.
 	// Check employee ID already exist or not
 	var existedID domain.Employee
 
-	if err := r.db.Where("employee_id = ?", empDetails.EmployeeID).First(&existedID).Error; err == nil {
+	err := r.db.Where("employee_id = ?", empDetails.EmployeeID).First(&existedID).Error
+	if err == nil {
 		// record found
-		return nil, errors.New("employee ID already exist")
-	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("conflict : Employee ID already exist")
+	}
+
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		// database error
 		return nil, err
 	}
