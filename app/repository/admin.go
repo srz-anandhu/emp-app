@@ -4,6 +4,8 @@ import (
 	"emp-app/app/domain"
 	"emp-app/app/dto"
 	"emp-app/pkg/helpers/e"
+	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -38,6 +40,21 @@ func (r *AdminRepoImpl) FindAdminByEmail(email string) (*domain.Admin, error) {
 
 // Add employee
 func (r *AdminRepoImpl) AddEmployee(empDetails dto.AddEmployeeDetails) (*domain.Employee, error) {
+
+	// Check employee ID already exist or not
+	var existedID domain.Employee
+
+	err := r.db.Where("employee_id = ?", empDetails.EmployeeID).First(&existedID).Error
+	if err == nil {
+		// record found
+		return nil, fmt.Errorf("conflict : Employee ID already exist")
+	}
+
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		// database error
+		return nil, err
+	}
+	// create employee
 	employee := &domain.Employee{
 		EmployeeID: empDetails.EmployeeID,
 		FullName:   empDetails.FullName,

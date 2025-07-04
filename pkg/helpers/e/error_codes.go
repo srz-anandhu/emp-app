@@ -16,7 +16,12 @@ const (
 const (
 	// ErrResourceNotFound : When no records corresponding to the request is found in the DB
 	ErrResourceNotFound = 404001 
+
+	// ErrConflict : when duplicate entries
+	ErrConflict = 409001
 )
+
+
 
 // 500 errors
 const (

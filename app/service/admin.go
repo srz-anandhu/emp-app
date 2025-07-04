@@ -8,11 +8,12 @@ import (
 	"emp-app/pkg/helpers/hash"
 	jwtPackage "emp-app/pkg/helpers/jwt"
 	"net/http"
+	"strings"
 )
 
 type AdminService interface {
 	Login(r *http.Request) (*dto.AdminToken, error)
-	AddEmployee (r *http.Request) (*domain.Employee, error)
+	AddEmployee(r *http.Request) (*domain.Employee, error)
 	AddAdmin(r *http.Request) (*dto.AdminLoginResponse, error)
 }
 
@@ -54,21 +55,21 @@ func (s *AdminServiceImpl) Login(r *http.Request) (*dto.AdminToken, error) {
 	}
 	// Adding fetched admin details to login reponse
 	adminRes := &dto.AdminLoginResponse{
-		ID: admin.ID,
-		Name: admin.Name,
+		ID:    admin.ID,
+		Name:  admin.Name,
 		Email: admin.Email,
-		Role: admin.Role,
+		Role:  admin.Role,
 	}
 
 	return &dto.AdminToken{
-		AdminLoginResponse: *adminRes,
-		AccessToken: accessToken,
-		RefreshToken: refreshToken,
-	},
-	nil
+			AdminLoginResponse: *adminRes,
+			AccessToken:        accessToken,
+			RefreshToken:       refreshToken,
+		},
+		nil
 }
 
-func (s *AdminServiceImpl) AddEmployee (r *http.Request) (*domain.Employee, error) {
+func (s *AdminServiceImpl) AddEmployee(r *http.Request) (*domain.Employee, error) {
 
 	body := &dto.AddEmployeeDetails{}
 	if err := body.Parse(r); err != nil {
@@ -93,7 +94,11 @@ func (s *AdminServiceImpl) AddEmployee (r *http.Request) (*domain.Employee, erro
 	emp, err := s.adminRepo.AddEmployee(*body)
 
 	if err != nil {
-		return nil, e.NewError(e.ErrInternalServer, "cant create employee", err)
+		if strings.Contains(err.Error(), "conflict") {
+
+			return nil, e.NewError(e.ErrConflict, "Employee ID already exists", err)
+		}
+		return nil, e.NewError(e.ErrInternalServer, "can't create employee", err)
 	}
 
 	return emp, nil
@@ -123,10 +128,10 @@ func (s *AdminServiceImpl) AddAdmin(r *http.Request) (*dto.AdminLoginResponse, e
 	}
 
 	admin := &dto.AdminLoginResponse{
-		ID: result.ID,
-		Name: result.Name,
+		ID:    result.ID,
+		Name:  result.Name,
 		Email: result.Email,
-		Role: result.Role,
+		Role:  result.Role,
 	}
 
 	return admin, nil
