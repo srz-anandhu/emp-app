@@ -122,7 +122,7 @@ func (e *EmployeeRequest) Validate(r *http.Request) error {
 
 type EmployeeUpdateRequest struct {
 	ID       int          `json:"id"`
-	Name     *string      `json:"name"`
+	FullName *string      `json:"FullName"`
 	DOB      *string      `json:"dob"`
 	Email    *string      `json:"email"`
 	Phone    *string      `json:"phone"`
