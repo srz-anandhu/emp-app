@@ -88,7 +88,7 @@ func (r *EmployeeRepoImpl) GetEmployee(empReq *dto.EmployeeRequest) (*domain.Emp
 func (r *EmployeeRepoImpl) UpdateEmployee(empUpdateReq *dto.EmployeeUpdateRequest) error {
 	result := r.db.Table("employees").Where("id = ?", empUpdateReq.ID).Updates(map[string]any{
 
-		"name":       empUpdateReq.Name,
+		"name":       empUpdateReq.FullName,
 		"dob":        empUpdateReq.DOB,
 		"email":      empUpdateReq.Email,
 		"phone":      empUpdateReq.Phone,
