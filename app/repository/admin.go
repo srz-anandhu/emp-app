@@ -14,6 +14,7 @@ type AdminRepo interface {
 	FindAdminByEmail(email string) (*domain.Admin, error)
 	AddEmployee(empDetails dto.AddEmployeeDetails) (*domain.Employee, error)
 	AddNewAdmin(adminDetails dto.AdminDetails) (*domain.Admin, error)
+	CountEmployees(count *int64) error
 }
 
 type AdminRepoImpl struct {
@@ -89,4 +90,9 @@ func (r *AdminRepoImpl) AddNewAdmin(adminDetails dto.AdminDetails) (*domain.Admi
 	}
 
 	return admin, nil
+}
+
+
+func (r *AdminRepoImpl) CountEmployees(count *int64) error {
+	return r.db.Table("employees").Count(count).Error
 }
