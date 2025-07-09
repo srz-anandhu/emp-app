@@ -7,6 +7,7 @@ import (
 	"emp-app/pkg/helpers/e"
 	"emp-app/pkg/helpers/hash"
 	jwtPackage "emp-app/pkg/helpers/jwt"
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -78,6 +79,15 @@ func (s *AdminServiceImpl) AddEmployee(r *http.Request) (*domain.Employee, error
 
 	if err := body.Validate(); err != nil {
 		return nil, e.NewError(e.ErrValidateRequest, "can't validate employee create request", err)
+	}
+	
+// Generate if there is no employee ID provided
+		if strings.TrimSpace(body.EmployeeID) == "" {
+		var count int64
+		if err := s.adminRepo.CountEmployees(&count); err != nil {
+			return nil, e.NewError(e.ErrInternalServer, "can't count employees", err)
+		}
+		body.EmployeeID = fmt.Sprintf("SRZEE%03d", count+1)
 	}
 
 	// Password hashing
