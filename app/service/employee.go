@@ -67,15 +67,16 @@ func (s *EmployeeServiceImpl) Login(r *http.Request) (*dto.LoginToken, error) {
 	}
 
 	empRes := &dto.EmployeeLoginResp{
-		ID:       emp.ID,
-		Name:     emp.FullName,
-		Email:    emp.Email,
-		Password: emp.Password,
-		Address:  emp.Address,
-		Dob:      emp.DOB,
-		Phone:    emp.Phone,
-		Position: emp.Position,
-		Salary:   emp.Salary,
+		ID:         emp.ID,
+		EmployeeID: emp.EmployeeID,
+		Name:       emp.FullName,
+		Email:      emp.Email,
+		Password:   emp.Password,
+		Address:    emp.Address,
+		Dob:        emp.DOB,
+		Phone:      emp.Phone,
+		Position:   emp.Position,
+		Salary:     emp.Salary,
 	}
 
 	return &dto.LoginToken{
@@ -231,13 +232,12 @@ func (s *EmployeeServiceImpl) ChangePassword(r *http.Request) error {
 	if err := hash.ComparePassword(passChangeReq.CurrentPassword, password); err != nil {
 		return e.NewError(e.ErrInternalServer, "password doesn't match", err)
 	}
-	
+
 	// Ensure new password and confirm password match
-	if passChangeReq.NewPassword == nil || passChangeReq.ConfirmPassword == nil || 
+	if passChangeReq.NewPassword == nil || passChangeReq.ConfirmPassword == nil ||
 		*passChangeReq.NewPassword != *passChangeReq.ConfirmPassword {
 		return e.NewError(e.ErrInvalidRequest, "new and confirm password do not match", nil)
-		}
-	
+	}
 
 	// Hash new password
 	hashedNewPass, err := hash.HashPassword(*passChangeReq.NewPassword)
@@ -247,7 +247,7 @@ func (s *EmployeeServiceImpl) ChangePassword(r *http.Request) error {
 
 	// Set hashed password and call repository to update
 	passChangeReq.NewPassword = &hashedNewPass
-	
+
 	if err := s.empRepo.ChangePassword(passChangeReq); err != nil {
 		return e.NewError(e.ErrInternalServer, "password changing failed", err)
 	}
