@@ -72,15 +72,16 @@ type LoginToken struct {
 }
 
 type EmployeeLoginResp struct {
-	ID       int         `json:"id"`
-	Name     string      `json:"name"`
-	Email    string      `json:"email"`
-	Password string      `json:"password"`
-	Dob      string      `json:"dob"`
-	Address  string      `json:"address"`
-	Phone    string      `json:"phone"`
-	Position string      `json:"position"`
-	Salary   json.Number `json:"salary"`
+	ID         int         `json:"id"`
+	EmployeeID string      `json:"employee_id"`
+	Name       string      `json:"name"`
+	Email      string      `json:"email"`
+	Password   string      `json:"password"`
+	Dob        string      `json:"dob"`
+	Address    string      `json:"address"`
+	Phone      string      `json:"phone"`
+	Position   string      `json:"position"`
+	Salary     json.Number `json:"salary"`
 }
 
 type EmployeeRequest struct {
